@@ -77,10 +77,11 @@ def has_bet(epoch, public_address):
     except Exception as e:
         print(f"Ошибка проверки ставки для эпохи {epoch}: {e}")
         return False
-
+        
 # Функция для ставок на рост (bull) для кошелька 1
 async def bet_bull(epoch):
     global nonce_1
+    nonce_1 = w3.eth.get_transaction_count(public_address_1, 'pending')
     base_fee = w3.eth.get_block('latest')['baseFeePerGas']
     max_priority_fee = w3.to_wei('2', 'gwei')
     max_fee_per_gas = base_fee + max_priority_fee
@@ -97,13 +98,13 @@ async def bet_bull(epoch):
     
     signed_txn = w3.eth.account.sign_transaction(txn, private_key_1)
     tx_hash = w3.eth.send_raw_transaction(signed_txn.raw_transaction)
-    nonce_1 += 1
     
     await send_telegram_message(f"✅ Ставка на рост (кошелек 1) сделана. 🚀\nЭпоха: {epoch}\nХэш транзакции: {tx_hash.hex()}\nСумма: {bet_amount} ETH")
 
 # Функция для ставок на падение (bear) для кошелька 2
 async def bet_bear(epoch):
     global nonce_2
+    nonce_2 = w3.eth.get_transaction_count(public_address_2, 'pending')
     base_fee = w3.eth.get_block('latest')['baseFeePerGas']
     max_priority_fee = w3.to_wei('2', 'gwei')
     max_fee_per_gas = base_fee + max_priority_fee
@@ -120,10 +121,8 @@ async def bet_bear(epoch):
     
     signed_txn = w3.eth.account.sign_transaction(txn, private_key_2)
     tx_hash = w3.eth.send_raw_transaction(signed_txn.raw_transaction)
-    nonce_2 += 1
     
     await send_telegram_message(f"✅ Ставка на падение (кошелек 2) сделана. 🐻\nЭпоха: {epoch}\nХэш транзакции: {tx_hash.hex()}\nСумма: {bet_amount} ETH")
-
 # Основная функция для запуска всех задач с периодичностью 10 минут
 async def main():
     # Показ логотипа при запуске
